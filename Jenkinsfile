@@ -1,36 +1,43 @@
-pipeline { 
+pipeline {
     agent any
+
+    environment {
+        // Define project directory and other environment variables
+        PROJECT_DIR = "C:\\Users\\Dell-Lap\\Downloads\\springbootwebapp-master\\springbootwebapp-master"
+        DEPLOY_DIR = "C:\\Users\\Dell-Lap\\Downloads\\Newfolder" // The folder where the JAR will be deployed
+        APP_NAME = "springbootwebapp" // JAR file name (update with the actual name if necessary)
+    }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    // Explicitly fetch the latest code from the repository
-                    git branch: 'master', url: 'https://github.com/muthu512/maven.git'
-                    bat 'git fetch --all'
-                    bat 'git reset --hard origin/master'
-                    bat 'git log -1' // Log the latest commit hash for verification
+                    // Checkout the source code from GitHub
+                    checkout scm
+                    // Optional: Log the latest commit hash for verification
+                    bat 'git log -1'
                 }
             }
         }
 
         stage('Build') {
             steps {
-                // Clean and build the project
-                bat 'mvn clean package'
-
-                // Log the build directory content for debugging
-                bat "dir C:\\Users\\Dell-Lap\\.jenkins\\workspace\\DeploySpringBoot\\target"
+                script {
+                    // Clean and build the project
+                    bat "mvn clean package -f ${PROJECT_DIR}\\pom.xml"
+                    
+                    // Log the build directory content for debugging
+                    bat "dir ${PROJECT_DIR}\\target"
+                }
             }
         }
 
         stage('Deploy') {
             steps {
                 script {
-                    // Define paths
-                    def buildJar = "C:\\Users\\Dell-Lap\\.jenkins\\workspace\\DeploySpringBoot\\target\\spring-SNAPSHOT.jar"
-                    def deployFolder = "C:\\Users\\Dell-Lap\\Downloads\\react-hello-world-master"
-                    def deployJar = "${deployFolder}\\spring-SNAPSHOT.jar"
+                    // Define paths for the build artifact and the deployment folder
+                    def buildJar = "${PROJECT_DIR}\\target\\${APP_NAME}-1.0.0.jar"  // Adjust this to the correct JAR name
+                    def deployJar = "${DEPLOY_DIR}\\${APP_NAME}-1.0.0.jar"  // Define where to deploy the JAR
 
                     // Verify if the built JAR exists
                     bat """
@@ -49,7 +56,7 @@ pipeline {
                     // Copy the new JAR to the deployment folder
                     bat "copy /Y \"${buildJar}\" \"${deployJar}\""
 
-                    // Start the application using the new JAR
+                    // Run the new JAR using Java with specified arguments
                     bat "start java -jar \"${deployJar}\" --spring.profiles.active=prod --server.port=1010"
                 }
             }
