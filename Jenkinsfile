@@ -36,8 +36,8 @@ pipeline {
             steps {
                 script {
                     // Define paths for the build artifact and the deployment folder
-                    def buildJar = "${PROJECT_DIR}\\target\\${APP_NAME}-1.0.0.jar"  // Adjust this to the correct JAR name
-                    def deployJar = "${DEPLOY_DIR}\\${APP_NAME}-1.0.0.jar"  // Define where to deploy the JAR
+                    def buildJar = "C:\\Users\\Dell-Lap\\Downloads\\springbootwebapp-master\\springbootwebapp-master\\target\\spring-boot-web-0.0.1-SNAPSHOT.jar"  // Adjust this to the correct JAR name
+                    def deployJar = "C:\\Users\\Dell-Lap\\Downloads\\Newfolder\\spring-boot-web-0.0.1-SNAPSHOT.jar"  // Define where to deploy the JAR
 
                     // Verify if the built JAR exists
                     bat """
